@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "advent-of-code-2024"
+version = "0.1.0"
+description = ""
+authors = ["Sebastian Lehrack <sebastian.lehrack@cognostics.de>"]
+readme = "README.md"
+packages = [{include = "advent_of_code_2024"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
