@@ -59,7 +59,7 @@ def bottomlefttotopright(file_content):
 
 
 def day_four_part_one(input_file: str, input_path: Path) -> int:
-    """solving puzzle one for day one: sorted distances"""
+    """x-mas wortsuche"""
     file_content = readin_files(input_file, input_path)
     file_content = [line.strip() for line in file_content]
     total_result = 0
@@ -89,7 +89,7 @@ def day_four_part_one(input_file: str, input_path: Path) -> int:
 
 
 def day_four_part_two(input_file, input_path: Path = Path.cwd()) -> int:
-    """doing sliding window differentiation"""
+    """mas in xform pattern search"""
     file_content = readin_files(input_file, input_path)
     file_content = [line.strip() for line in file_content]
     # top left corner to lower right corner
@@ -97,36 +97,33 @@ def day_four_part_two(input_file, input_path: Path = Path.cwd()) -> int:
 
     max_row = len(file_content)
     max_col = len(file_content[0])
-    toplefttoright: dict[tuple[int, int], str] = {}
-    starting_tuples = [(counter, 0) for counter in range(max_row)]
-    starting_tuples.extend([(0, counter) for counter in range(1, max_col)])
-    for point in starting_tuples:
-        act_str = ''
-        step_counter = 0
-        limit = min(max_row - point[0], max_col - point[1])
-        while step_counter < limit:
-            act_str += file_content[point[0] + step_counter][point[1] + step_counter]
-            step_counter += 1
-        toplefttoright[point] = act_str
+    # get all non-border points
+    all_points: list[tuple[int, int]] = []
+    for col_counter in range(1, max_col - 1):
+        for row_counter in range(1, max_row - 1):
+            all_points.append((row_counter, col_counter))
 
-    for point, line in toplefttoright.items():
-        for match in find_all_MAS(line):
-            # calc position of middle A
-            mid_pos = (point[0] + match.start() + 1, point[1] + match.start() + 1)
-            mid_val = file_content[mid_pos[0]][mid_pos[1]]
-            assert mid_val == "A"
-            diag_point_one = (mid_pos[0] + 1, mid_pos[1] - 1)
-            diag_point_two = (mid_pos[0] - 1, mid_pos[1] + 1)
-            if file_content[diag_point_one[0]][diag_point_one[1]] == "M" and \
-                    file_content[diag_point_two[0]][diag_point_two[1]] == "S":
-                total_match_counter += 1
-                continue
-            if file_content[diag_point_one[0]][diag_point_one[1]] == "S" and \
-                    file_content[diag_point_two[0]][diag_point_two[1]] == "M":
-                total_match_counter += 1
-                continue
+    for point in all_points:
+        if file_content[point[0]][point[1]] != 'A':
+            continue
+        # get surrounding pattern
+        top_left = file_content[point[0] - 1][point[1] - 1]
+        top_right = file_content[point[0] - 1][point[1] + 1]
+        bottom_left = file_content[point[0] + 1][point[1] - 1]
+        bottom_right = file_content[point[0] + 1][point[1] + 1]
+        direction_grave = False
+        direction_deque = False
+        if any([x in ['X', 'A'] for x in [top_right, top_left, bottom_right, bottom_left]]):
+            continue
 
-    # and now also reverse...
+        if (top_left == 'M' and bottom_right == 'S') or (top_left == 'S' and bottom_right == 'M'):
+            direction_grave = True
+
+        if (top_right == 'M' and bottom_left == 'S') or (top_right == 'S' and bottom_left == 'M'):
+            direction_deque = True
+
+        if direction_grave and direction_deque:
+            total_match_counter += 1
 
     return total_match_counter
 
